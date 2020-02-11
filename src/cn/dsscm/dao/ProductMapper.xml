@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="cn.dsscm.dao.ProductMapper">
+	<select id="getAll" resultType="Product">
+		SELECT p.*,c1.name p1Name,c2.name p2Name,c3.name p3Name
+		  FROM tb_product p,
+ 			   tb_product_category c1,tb_product_category c2 ,tb_product_category c3
+		 WHERE p.categoryLevel1Id = c1.id AND p.categoryLevel2Id = c2.id AND p.categoryLevel3Id = c3.id
+		 <if test="categoryLevel1Id !=null and categoryLevel1Id>0">and categoryLevel1Id=#{categoryLevel1Id}</if>
+		 <if test="name !=null and name!=''">and p.name like concat('%',#{name},'%')</if>
+	</select>
+	<select id="findById" resultType="Product">
+		SELECT p.*,c1.name p1Name,c2.name p2Name,c3.name p3Name
+		  FROM tb_product p,
+ 			   tb_product_category c1,tb_product_category c2 ,tb_product_category c3
+		 WHERE p.categoryLevel1Id = c1.id AND p.categoryLevel2Id = c2.id AND p.categoryLevel3Id = c3.id and p.id=#{id}
+	</select>
+	<delete id="delete">
+		delete from tb_product
+		where id=#{id}
+	</delete>
+	<insert id="save" parameterType="Product">
+		INSERT INTO tb_product 
+					(name, description, price, placement, stock, categoryLevel1Id, 
+					categoryLevel2Id, categoryLevel3Id, fileName, isDelete, createdBy, creationDate)
+			 VALUES (#{name}, #{description}, #{price}, #{placement}, #{stock}, #{categoryLevel1Id}, 
+			 		#{categoryLevel2Id}, #{categoryLevel3Id}, #{fileName}, #{isDelete}, #{createdBy}, #{creationDate});
+
+	</insert>
+	<update id="update" parameterType="Product">
+		UPDATE tb_product 
+		<set>
+			<if test="name !=null and name !=''">name=#{name},</if>
+			<if test="description !=null and description !=''">description=#{description},</if>
+			<if test="price !=null and price >0">price=#{price},</if>
+			<if test="placement !=null and placement !=''">placement=#{placement},</if>
+			<if test="stock !=null and stock >=0">stock=#{stock},</if>
+			<if test="categoryLevel1Id !=null and categoryLevel1Id >=0">categoryLevel1Id=#{categoryLevel1Id},</if>
+			<if test="categoryLevel1Id !=null and categoryLevel1Id >=0">categoryLevel1Id=#{categoryLevel1Id},</if>
+			<if test="categoryLevel3Id !=null and categoryLevel3Id >=0">categoryLevel3Id=#{categoryLevel3Id},</if>
+			<if test="fileName !=null and fileName !=''">fileName=#{fileName},</if>
+			<if test="isDelete !=null and isDelete >=0">isDelete=#{isDelete},</if>
+			<if test="modifyBy !=null and modifyBy >=0">modifyBy=#{modifyBy},</if>
+			<if test="modifyDate !=null">modifyDate=#{modifyDate},</if>
+		</set>
+		WHERE	id = #{id} ;
+		
+	</update>
+	<!-- <select id="findById" resultType="Product" parameterType="Long">
+		select *from tb_product where id=#{id};
+	</select>
+	<select id="getProductsByCategoryLevelOne" resultType="Product" parameterType="Long">
+		select *from tb_product where categoryLevel1Id=#{id}
+	</select>
+	<select id="getProductsByCategoryLevelTwo" resultType="Product" parameterType="Long">
+		select *from tb_product where categoryLevel2Id=#{id}
+	</select>
+	<delete id="delete" parameterType="Long">
+		delete from tb_product
+		where id=#{id}
+	</delete>
+	<insert id="save" parameterType="Product">
+		INSERT INTO tb_product 
+					(NAME, description, price, placement, stock, categoryLevel1Id, categoryLevel2Id, 
+					categoryLevel3Id, fileName, isDelete, createdBy, creationDate)
+			 VALUES
+					( #{name}, #{description}, #{price}, #{placement}, #{stock}, #{categoryLevel1Id}, 
+					#{categoryLevel2Id}, #{categoryLevel3Id}, #{fileName}, #{isDelete}, #{createdBy}, #{creationDate}, 
+					);
+
+	</insert>
+	<update id="update" parameterType="Product">
+		
+		UPDATE tb_product 
+		   <set>
+		   		<if test="name !=null and name !=''">NAME = #{name},</if>
+		   		<if test="description !=null and description !=''">description = #{description},</if>
+		   		<if test="price>0">price = #{price},</if>
+		   		<if test="placement !=null and placement !=''">placement = #{placement},</if>
+		   		<if test="stock > 0">stock = #{stock},</if>
+		   		<if test="categoryLevel1Id >0">categoryLevel1Id = #{categoryLevel1Id},</if>
+		   		<if test="categoryLevel2Id >0">categoryLevel2Id = #{categoryLevel2Id},</if>
+		   		<if test="categoryLevel3Id >0">categoryLevel3Id = #{categoryLevel3Id},</if>
+		   		<if test="fileName !=null and fileName !=''">fileName = #{fileName},</if>
+		   		<if test="isDelete >=0">isDelete = #{isDelete},</if>
+		   		<if test="modifyBy >0">modifyBy = #{modifyBy},</if>
+		   		<if test="modifyDate !=null and name !=''">modifyDate = #{modifyDate},</if>
+		   </set>
+		  WHERE  id = #{id};	
+	</update>
+	<update id="updateChildID" parameterType="int">
+		UPDATE tb_product 
+			<set>
+				<if test="categoryLevel2Id >0">categoryLevel2Id = #{parentid},</if>
+			</set>
+	</update>
+	<select id="getProductRowCountByCategoryLevelTwo">
+		select count(*) from tb_product where categoryLevel2Id=#{categoryId};
+	</select>
+	<update id="updateStock" parameterType="Long">
+		update tb_product
+			<set>
+				<if test="stock > 0">stock =#{quantity},</if>
+			</set>
+			where id=#{id}
+	</update> -->
+</mapper>

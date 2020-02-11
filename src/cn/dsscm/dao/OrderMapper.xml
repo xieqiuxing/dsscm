@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="cn.dsscm.dao.OrderMapper">
+	<resultMap type="Order" id="orders">
+		<id column="oid" property="id"/>
+		<result column="creationDate" property="creationDate"/>
+		<result column="createdBy" property="createdBy"/>
+		<result column="userName" property="userName"/>
+		<result column="customerPhone" property="customerPhone"/>
+		<result column="userAddress" property="userAddress"/>
+		<result column="proCount" property="proCount"/>
+		<result column="cost" property="cost"/>
+		<result column="serialNumber" property="serialNumber"/>
+		<result column="status" property="status"/>
+		<result column="payType" property="payType"/>	
+		<collection property="product" ofType="Product">
+			<id column="pid" property="id"/>
+			<result column="oCost" property="cost"/>
+			<result column="dStock" property="stock"/>
+			<result column="name" property="name"/>
+			<result column="fileName" property="fileName"/>
+			<result column="price" property="price"/>
+		</collection>
+	</resultMap>
+	<select id="getOrders" resultMap="orders">
+		select	*,o.id oid,p.id pid,d.quantity dStock,o.creationDate ocreationDate,o.createdBy ocreatedBy,d.cost oCost
+		  from	tb_order o, tb_order_detail d,tb_product p
+		 where	o.id=d.orderId AND p.id=d.productId
+		 <if test="oid !=null and oid >0">and oid=#{oid}</if>
+		 <if test="userName !=null and userName!=''">and userName like CONCAT ('%',#{userName},'%')</if>
+		 <if test="status !=null and status>0">and status=#{status}</if>
+	</select>
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dsscm.dao.ProviderMapper">
+	<insert id="add" parameterType="Provider">	 
+		INSERT INTO tb_provider 
+					(
+					proCode, proName, proDesc, proContact, proPhone, proAddress, proFax, 
+					createdBy, creationDate, companyLicPicPath, orgCodePicPath
+					)
+			VALUES
+					(
+					#{proCode}, #{proName}, #{proDesc},#{proContact},#{proPhone}, #{proAddress}, 
+					#{proFax}, #{createdBy}, #{creationDate}, #{companyLicPicPath}, #{orgCodePicPath}
+					);
+		 
+	</insert>
+	<select id="getProviderList" resultType="Provider">
+		select  *
+		  from	tb_provider
+		  <where>
+		  	<if test="proName !=null and proName !=''">proName like concat('%',#{proName},'%')</if>
+		  	<if test="proCode !=null and proCode !=''">and proCode like concat('%',#{proCode},'%')</if>
+		  </where>
+	</select>
+	<select id="getProList" resultType="Provider">
+		select *
+		  from tb_provider
+	</select>
+	<select id="getProviderCount" resultType="int">
+		select count(id)
+		  from tb_provider
+		<where>
+		  	<if test="proName !=null and proName !=''">proName=#{proName}</if>
+		  	<if test="proCode !=null and proCode !=''">and proCode=#{proCode}</if>
+		</where>
+	</select>
+	<delete id="deleteProviderById">
+		delete from tb_provider
+		where id=#{id}
+	</delete>
+	<select id="getProviderById" resultType="Provider">
+		select * 
+		  from tb_provider
+		 where id=#{id}
+	</select>
+	<update id="modify" parameterType="Provider">
+		UPDATE tb_provider 
+	<set>
+		<if test="proCode !=null and proCode !=''">proCode=#{proCode},</if>
+		<if test="proName !=null and proName !=''">proName=#{proName},</if>
+		<if test="proDesc !=null and proDesc !=''">proDesc=#{proDesc},</if>
+		<if test="proContact !=null and proContact !=''">proContact=#{proContact},</if>
+		<if test="proPhone !=null and proPhone !=''">proPhone=#{proPhone},</if>
+		<if test="proAddress !=null and proAddress !=''">proAddress=#{proAddress},</if>
+		<if test="proFax !=null and proFax !=''">proFax=#{proFax},</if>
+		<if test="modifyDate !=null">modifyDate=#{modifyDate},</if>
+		<if test="modifyBy >0">modifyBy=#{modifyBy},</if>
+		<if test="companyLicPicPath !=null and companyLicPicPath !=''">companyLicPicPath=#{companyLicPicPath},</if>
+		<if test="orgCodePicPath !=null and orgCodePicPath !=''">orgCodePicPath=#{orgCodePicPath},</if>
+	</set>  
+		WHERE id = #{id} ;
+	</update>
+</mapper>

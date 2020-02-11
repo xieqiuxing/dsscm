@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="cn.dsscm.dao.ProductCategoryMapper">
+ 	<select id="getRootCategories" resultType="ProductCategory">
+ 		select * from tb_product_category
+ 		where type=1
+ 	</select>
+ 	<select id="getProductCategories" parameterType="long" resultType="ProductCategory">
+ 		select *from tb_product_category where parentId=#{parentId}
+ 	</select>
+ 	<select id="findAll" resultType="ProductCategory">
+ 	   SELECT 	*
+	    FROM
+	    		(SELECT pc.*, pc.name pc1Name ,'' pc2Name,'' pc3Name
+				FROM tb_product_category pc WHERE parentId=0
+				UNION
+				SELECT pc2.*, pc1.name pc1Name ,pc2.name pc2Name,'' pc3Name
+				FROM tb_product_category pc1 LEFT JOIN tb_product_category pc2 ON pc1.id=pc2.parentId  
+			    WHERE pc1.type=1
+				UNION
+				SELECT pc3.* , pc1.name pc1Name ,pc2.Name pc2name ,pc3.name pc3Name
+			  	FROM tb_product_category pc1 LEFT JOIN tb_product_category pc2 ON pc1.id=pc2.parentId 
+				LEFT JOIN tb_product_category pc3 ON pc2.id =pc3.parentId
+				WHERE pc1.type=1)tab
+	<where>
+		        <if test="name!=null and name!=''">
+		          and tab.name like CONCAT('%',#{name},'%') 
+		        </if>
+		        <if test="parentId!=null and parentId>=0">
+		          and (tab.id LIKE CONCAT(#{parentId}, '____') or tab.id LIKE CONCAT(#{parentId}, '__')) 
+		        </if>
+		        <if test="type!=null and type>=0">
+		          and tab.type=#{type}
+		        </if>
+	</where>
+ 	</select>
+ 	<delete id="delete">
+ 		delete from tb_product_category where id=#{pid} or id like concat(#{pid},'____') or id like concat(#{pid},'__')
+ 	</delete>
+ 	<select id="findcount" resultType="Integer">
+ 		select count(*)from tb_product_category where name=#{name}
+ 	</select>
+ 	<select id="findCountById" resultType="Integer">
+ 		select count(*)from tb_product_category where parentId=#{id}
+ 	</select>
+ 	<select id="findMaxId" resultType="long">
+ 		select max(id) from tb_product_category where parentId=#{id}
+ 	</select>
+ 	<insert id="save" parameterType="ProductCategory">		
+		INSERT INTO tb_product_category (id, NAME, parentId, TYPE, iconClass)
+			 VALUES
+					(#{id}, #{name}, #{parentId}, #{type}, #{iconClass});
+ 	</insert>
+ 	<resultMap type="ProductCategory" id="cates">
+ 		<id column="id" property="id"/>
+ 		<result column="name" property="name"/>
+ 		<collection property="productCategories" ofType="ProductCategory"> 
+ 			<id column="pc2id" property="id"/>
+ 			<result column="pc2name" property="name"/>
+ 			<result column="pc2pid" property="parentId"/>
+ 			<collection property="productCategories" ofType="ProductCategory"> 
+ 			<id column="pc3id" property="id"/>
+ 			<result column="pc3name" property="name"/>
+ 			<result column="pc3pid" property="parentId"/>
+ 		</collection>
+ 		</collection>
+ 	</resultMap>
+ 	<select id="findProductCategorys" resultMap="cates">
+ 		SELECT	p1.*,p2.id pc2id,p2.parentId pc2pid,p2.name pc2name,p3.id pc3id,p3.parentId pc3pid,p3.name pc3name
+		  FROM	tb_product_category p1,tb_product_category p2,tb_product_category p3
+		 WHERE	p1.id=p2.parentId AND p2.id=p3.parentId
+ 	</select>
+ </mapper>
